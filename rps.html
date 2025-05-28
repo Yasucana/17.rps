@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .button {
+            padding: 15px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: transform 0.1s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .button:active {
+            transform: scale(0.95);
+        }
+        .result {
+            margin: 20px 0;
+            font-size: 20px;
+            min-height: 90px; /* Ensures layout stability */
+        }
+        .scores {
+            font-size: 18px;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rock Paper Scissors</h1>
+        <p>Choose your move:</p>
+        <div class="buttons">
+            <button class="button" data-choice="Rock">Rock</button>
+            <button class="button" data-choice="Paper">Paper</button>
+            <button class="button" data-choice="Scissors">Scissors</button>
+        </div>
+        <div class="result">
+            <p id="user-choice"></p>
+            <p id="computer-choice"></p>
+            <p id="outcome"></p>
+        </div>
+        <div class="scores">
+            <p>Wins: <span id="wins">0</span></p>
+            <p>Losses: <span id="losses">0</span></p>
+            <p>Ties: <span id="ties">0</span></p>
+        </div>
+    </div>
+    <script>
+        const buttons = document.querySelectorAll('.button');
+        const userChoiceEl = document.getElementById('user-choice');
+        const computerChoiceEl = document.getElementById('computer-choice');
+        const outcomeEl = document.getElementById('outcome');
+        const winsEl = document.getElementById('wins');
+        const lossesEl = document.getElementById('losses');
+        const tiesEl = document.getElementById('ties');
+
+        let wins = 0;
+        let losses = 0;
+        let ties = 0;
+        let isProcessing = false;
+
+        const choices = ['Rock', 'Paper', 'Scissors'];
+
+        function getComputerChoice() {
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choices[randomIndex];
+        }
+
+        function determineWinner(user, computer) {
+            if (user === computer) return 'tie';
+            if (
+                (user === 'Rock' && computer === 'Scissors') ||
+                (user === 'Paper' && computer === 'Rock') ||
+                (user === 'Scissors' && computer === 'Paper')
+            ) return 'win';
+            return 'lose';
+        }
+
+        function updateScores(result) {
+            if (result === 'win') winsEl.textContent = ++wins;
+            else if (result === 'lose') lossesEl.textContent = ++losses;
+            else tiesEl.textContent = ++ties;
+        }
+
+        function displayResult(userChoice, computerChoice, result) {
+            userChoiceEl.textContent = `You chose: ${userChoice}`;
+            computerChoiceEl.textContent = `Computer chose: ${computerChoice}`;
+            outcomeEl.textContent = result === 'win' ? 'You win!' : 
+                                   result === 'lose' ? 'You lose!' : 'It\'s a tie!';
+            const resultDiv = document.querySelector('.result');
+            resultDiv.classList.add('pulse');
+            setTimeout(() => resultDiv.classList.remove('pulse'), 500);
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (isProcessing) return;
+                isProcessing = true;
+
+                const userChoice = button.dataset.choice;
+                const computerChoice = getComputerChoice();
+                const result = determineWinner(userChoice, computerChoice);
+
+                updateScores(result);
+                displayResult(userChoice, computerChoice, result);
+
+                setTimeout(() => { isProcessing = false; }, 1000); // 1-second cooldown
+            });
+        });
+    </script>
+</body>
+</html>
